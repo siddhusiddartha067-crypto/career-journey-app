@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Career Journey - Student Developer Career Hub</title>
+  <meta name="description" content="Career Journey - A modern career development companion for engineering students to master skills, practice DSA, build projects, and become software developers." />
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- React, ReactDOM, Babel for in-browser standalone execution -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .scrollbar-none::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-none {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased selection:bg-indigo-500 selection:text-white min-h-screen">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function triggerCelebration() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 45,
+          spread: 60,
+          origin: { y: 0.6 },
+          colors: ['#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ec4899']
+        });
+      }
+    }
+
+    const INITIAL_ROADMAP = [
+      {
+        id: 1,
+        title: 'HTML & CSS',
+        category: 'Foundation',
+        description: 'Semantic markup, accessibility, forms, the Box Model, Flexbox, CSS Grid, and responsive utility styling with Tailwind CSS.',
+        estimatedWeeks: '2-3 weeks',
+        status: 'completed',
+        subSkills: [
+          { id: 'hc1', name: 'Semantic markup & document structure', completed: true },
+          { id: 'hc2', name: 'Images, responsive picture tags & alt attributes', completed: true },
+          { id: 'hc3', name: 'Box model, margin, padding, border-box', completed: true },
+          { id: 'hc4', name: 'Flexbox axis alignment & responsive CSS Grid', completed: true },
+          { id: 'hc5', name: 'Tailwind CSS utility classes & responsive variants', completed: true }
+        ]
+      },
+      {
+        id: 2,
+        title: 'JavaScript',
+        category: 'Programming',
+        description: 'Modern ES6+ syntax, asynchronous programming, promises, DOM manipulation, closures, and event loop execution.',
+        estimatedWeeks: '3-4 weeks',
+        status: 'completed',
+        subSkills: [
+          { id: 'js1', name: 'Array methods (map, filter, reduce, find)', completed: true },
+          { id: 'js2', name: 'Promises, async/await and Fetch API', completed: true },
+          { id: 'js3', name: 'DOM manipulation & event delegation', completed: true },
+          { id: 'js4', name: 'Lexical scope, closures & function currying', completed: true },
+          { id: 'js5', name: 'Event loop, call stack & microtasks', completed: true }
+        ]
+      },
+      {
+        id: 3,
+        title: 'Python',
+        category: 'Programming',
+        description: 'Versatile language for backend development, scripting, data handling, and algorithmic problem-solving.',
+        estimatedWeeks: '3-4 weeks',
+        status: 'in_progress',
+        subSkills: [
+          { id: 'py1', name: 'Built-in data structures (lists, tuples, dicts, sets)', completed: true },
+          { id: 'py2', name: 'OOP implementation with classes and dunder methods', completed: true },
+          { id: 'py3', name: 'List, set & dictionary comprehensions', completed: true },
+          { id: 'py4', name: 'Custom decorators and generator functions', completed: false },
+          { id: 'py5', name: 'Exception handling with try/except/finally blocks', completed: false }
+        ]
+      },
+      {
+        id: 4,
+        title: 'C/C++',
+        category: 'Programming',
+        description: 'High-performance systems programming, pointers, manual memory allocation, and the Standard Template Library (STL).',
+        estimatedWeeks: '3-4 weeks',
+        status: 'in_progress',
+        subSkills: [
+          { id: 'cpp1', name: 'Pointers, pointer arithmetic & reference variables', completed: true },
+          { id: 'cpp2', name: 'C++ STL containers (vector, unordered_map, set, stack)', completed: true },
+          { id: 'cpp3', name: 'C++ STL algorithms (sort, binary_search, lower_bound)', completed: true },
+          { id: 'cpp4', name: 'Dynamic memory management & avoiding memory leaks', completed: false },
+          { id: 'cpp5', name: 'OOP concepts (Inheritance, virtual functions, templates)', completed: false }
+        ]
+      },
+      {
+        id: 5,
+        title: 'Data Structures',
+        category: 'Core CS',
+        description: 'Linear and non-linear memory representations: Arrays, Linked Lists, Stacks, Queues, Hash Tables, Trees, and Graphs.',
+        estimatedWeeks: '4-5 weeks',
+        status: 'in_progress',
+        subSkills: [
+          { id: 'ds1', name: 'Implement Singly and Doubly Linked Lists from scratch', completed: true },
+          { id: 'ds2', name: 'Stack and Queue implementations and applications', completed: true },
+          { id: 'ds3', name: 'Hash Map lookups, hash collision handling', completed: true },
+          { id: 'ds4', name: 'Binary Tree traversals (Inorder, Preorder, Postorder, Level-order)', completed: false },
+          { id: 'ds5', name: 'Min-Heap and Max-Heap priority queue operations', completed: false }
+        ]
+      },
+      {
+        id: 6,
+        title: 'Algorithms',
+        category: 'Core CS',
+        description: 'Algorithmic problem-solving methodologies: Big-O analysis, Searching, Sorting, Two Pointers, Sliding Window, BFS/DFS, and DP.',
+        estimatedWeeks: '4-6 weeks',
+        status: 'in_progress',
+        subSkills: [
+          { id: 'alg1', name: 'Asymptotic Big-O time and space complexity evaluation', completed: true },
+          { id: 'alg2', name: 'Binary Search implementation and boundary conditions', completed: true },
+          { id: 'alg3', name: 'Divide-and-conquer sorting (Merge Sort & Quick Sort)', completed: true },
+          { id: 'alg4', name: 'Breadth-First Search (BFS) and Depth-First Search (DFS)', completed: false },
+          { id: 'alg5', name: 'Dynamic Programming: Memoization and Tabulation approaches', completed: false }
+        ]
+      },
+      {
+        id: 7,
+        title: 'SQL',
+        category: 'Core CS',
+        description: 'Relational database architecture, CRUD queries, multi-table JOINs, normalization (1NF-3NF), indexing, and ACID guarantees.',
+        estimatedWeeks: '2-3 weeks',
+        status: 'not_started',
+        subSkills: [
+          { id: 'sql1', name: 'Write fluent CRUD operations and filtered queries', completed: false },
+          { id: 'sql2', name: 'Multi-table INNER and OUTER joins with condition filters', completed: false },
+          { id: 'sql3', name: 'Aggregate data using GROUP BY and HAVING clauses', completed: false },
+          { id: 'sql4', name: 'Database normalization rules and reducing data redundancy', completed: false },
+          { id: 'sql5', name: 'Index creation, EXPLAIN query plans & transaction isolation', completed: false }
+        ]
+      },
+      {
+        id: 8,
+        title: 'Git & GitHub',
+        category: 'Foundation',
+        description: 'Industry-standard version control: commits, branch workflows, merge conflicts, pull requests, and open-source collaboration.',
+        estimatedWeeks: '1-2 weeks',
+        status: 'completed',
+        subSkills: [
+          { id: 'git1', name: 'Configuring Git credentials and SSH authentication keys', completed: true },
+          { id: 'git2', name: 'Writing clear, conventional commit messages', completed: true },
+          { id: 'git3', name: 'Creating feature branches and opening GitHub Pull Requests', completed: true },
+          { id: 'git4', name: 'Resolving merge conflicts and rebasing branches cleanly', completed: true },
+          { id: 'git5', name: 'Drafting professional markdown README documentation for repositories', completed: true }
+        ]
+      },
+      {
+        id: 9,
+        title: 'React',
+        category: 'Frontend',
+        description: 'Declarative component-based UI engineering with JSX, useState, useEffect, custom hooks, and state management.',
+        estimatedWeeks: '3-4 weeks',
+        status: 'in_progress',
+        subSkills: [
+          { id: 'rc1', name: 'Building reusable, modular components with TypeScript props', completed: true },
+          { id: 'rc2', name: 'Managing local state and side effects with useState and useEffect', completed: true },
+          { id: 'rc3', name: 'Fetching API data with loading and error boundary states', completed: true },
+          { id: 'rc4', name: 'Authoring clean custom hooks to encapsulate reusable logic', completed: false },
+          { id: 'rc5', name: 'Performance optimization with React.memo and useCallback', completed: false }
+        ]
+      },
+      {
+        id: 10,
+        title: 'Backend Development',
+        category: 'Backend',
+        description: 'Server-side engineering with Node.js and Express: REST API routes, middleware, JWT authentication, and database integration.',
+        estimatedWeeks: '4-5 weeks',
+        status: 'not_started',
+        subSkills: [
+          { id: 'be1', name: 'Build structured REST API endpoints using Express', completed: false },
+          { id: 'be2', name: 'Implement custom middleware for request logging and error handling', completed: false },
+          { id: 'be3', name: 'Secure user login with password hashing and JWT authentication', completed: false },
+          { id: 'be4', name: 'Connect Express server to relational and document databases', completed: false },
+          { id: 'be5', name: 'Input validation and sanitization against injection attacks', completed: false }
+        ]
+      },
+      {
+        id: 11,
+        title: 'Projects',
+        category: 'Practical',
+        description: 'Translating knowledge into production full-stack apps with authentication, real databases, and clean architecture.',
+        estimatedWeeks: '4-6 weeks',
+        status: 'not_started',
+        subSkills: [
+          { id: 'prj1', name: 'Architect and build a full-stack CRUD application', completed: false },
+          { id: 'prj2', name: 'Deploy project live with custom domain and public URL', completed: false },
+          { id: 'prj3', name: 'Write a comprehensive README with architecture diagrams and setup instructions', completed: false },
+          { id: 'prj4', name: 'Implement persistent database storage with foreign key relations', completed: false },
+          { id: 'prj5', name: 'Feature project on GitHub profile with clean commit history', completed: false }
+        ]
+      },
+      {
+        id: 12,
+        title: 'Placement & Interview Preparation',
+        category: 'Career Prep',
+        description: 'Campus placement and off-campus tech hiring prep: 1-page ATS resume, online assessments, Core CS revision, and behavioral STAR stories.',
+        estimatedWeeks: '4-6 weeks',
+        status: 'not_started',
+        subSkills: [
+          { id: 'pip1', name: 'Format ATS-optimized 1-page engineering resume with metrics', completed: false },
+          { id: 'pip2', name: 'Complete 30 timed Online Assessment coding simulations', completed: false },
+          { id: 'pip3', name: 'Revise 50 essential Core CS questions (OOP, DBMS, OS, Networks)', completed: false },
+          { id: 'pip4', name: 'Prepare 5 structured behavioral STAR stories from real projects', completed: false },
+          { id: 'pip5', name: 'Conduct peer mock interviews with whiteboard problem solving', completed: false }
+        ]
+      }
+    ];
+
+    const INITIAL_TASKS = [
+      { id: 'task-1', title: 'Solve LeetCode #1: Two Sum (Optimal Hash Map approach)', category: 'DSA', priority: 'high', estimatedMinutes: 30, completed: true },
+      { id: 'task-2', title: 'Build responsive navigation bar using Tailwind CSS Flexbox', category: 'Web Dev', priority: 'high', estimatedMinutes: 45, completed: true },
+      { id: 'task-3', title: 'Review Git merge vs. rebase differences & commit conventions', category: 'Core CS', priority: 'medium', estimatedMinutes: 20, completed: false },
+      { id: 'task-4', title: 'Refactor user authentication routes with JWT verification', category: 'Project', priority: 'high', estimatedMinutes: 50, completed: false },
+      { id: 'task-5', title: 'Revise DBMS ACID properties and indexing concepts', category: 'Core CS', priority: 'medium', estimatedMinutes: 25, completed: false }
+    ];
+
+    const INITIAL_PROJECTS = [
+      {
+        id: 'proj-1',
+        title: 'CampusConnect - Peer Tutoring & Study Material Exchange',
+        description: 'A full-stack collaborative platform for university students to share lecture notes, find study buddies by subject, and schedule peer tutoring sessions with real-time messaging.',
+        technologies: ['React', 'Node.js', 'Express', 'MongoDB', 'Tailwind CSS', 'Socket.io'],
+        status: 'In Progress',
+        githubUrl: 'https://github.com/siddharthadev/campus-connect',
+        liveUrl: 'https://campus-connect.demo.app'
+      },
+      {
+        id: 'proj-2',
+        title: 'AlgoVisualizer - Interactive Algorithm & Graph Simulator',
+        description: 'An interactive web tool that step-by-step visualizes pathfinding algorithms (Dijkstra, A*, BFS, DFS) and sorting routines (Quick Sort, Merge Sort) with customizable speeds and obstacle walls.',
+        technologies: ['TypeScript', 'React', 'HTML5 Canvas', 'Tailwind CSS'],
+        status: 'Completed',
+        githubUrl: 'https://github.com/siddharthadev/algo-visualizer',
+        liveUrl: 'https://algo-visualizer.demo.app'
+      },
+      {
+        id: 'proj-3',
+        title: 'DevTrack - Software Engineering Internship Tracker',
+        description: 'A specialized job application tracker built for computer science students to manage application stages, cold email follow-up alerts, interview dates, and salary comparisons.',
+        technologies: ['Next.js', 'TypeScript', 'PostgreSQL', 'Prisma', 'Tailwind CSS'],
+        status: 'Planned',
+        githubUrl: 'https://github.com/siddharthadev/devtrack-app',
+        liveUrl: 'https://devtrack.demo.app'
+      }
+    ];
+
+    const INITIAL_DSA_PROBLEMS = [
+      // 1. Arrays
+      { id: 'd-1', title: 'Two Sum', topic: 'Arrays', difficulty: 'Easy', completed: true, bookmarked: false, timeComplexity: 'O(n)', spaceComplexity: 'O(n)', hint: 'Use a hash map to store numbers and indices.', practiceUrl: 'https://leetcode.com/problems/two-sum/' },
+      { id: 'd-2', title: 'Best Time to Buy and Sell Stock', topic: 'Arrays', difficulty: 'Easy', completed: true, bookmarked: false, timeComplexity: 'O(n)', spaceComplexity: 'O(1)', hint: 'Track min price seen so far and max profit.', practiceUrl: 'https://leetcode.com/problems/best-time-to-buy-and-sell-stock/' },
+      { id: 'd-3', title: 'Product of Array Except Self', topic: 'Arrays', difficulty: 'Medium', completed: false, bookmarked: true, timeComplexity: 'O(n)', spaceComplexity: 'O(1)', hint: 'Calculate prefix products then multiply suffix products.', practiceUrl: 'https://leetcode.com/problems/product-of-array-except-self/' },
+      // 2. Strings
+      { id: 'd-4', title: 'Valid Palindrome', topic: 'Strings', difficulty: 'Easy', completed: true, bookmarked: false, timeComplexity: 'O(n)', spaceComplexity: 'O(1)', hint: 'Two pointers skipping non-alphanumeric chars.', practiceUrl: 'https://leetcode.com/problems/valid-palindrome/' },
+      { id: 'd-5', title: 'Longest Substring Without Repeating Characters', topic: 'Strings', difficulty: 'Medium', completed: false, bookmarked: true, timeComplexity: 'O(n)', spaceComplexity: 'O(min(n,m))', hint: 'Sliding window with map of last seen indices.', practiceUrl: 'https://leetcode.com/problems/longest-substring-without-repeating-characters/' },
+      // 3. Linked Lists
+      { id: 'd-6', title: 'Reverse Linked List', topic: 'Linked Lists', difficulty: 'Easy', completed: true, bookmarked: false, timeComplexity: 'O(n)', spaceComplexity: 'O(1)', hint: 'Iteratively redirect curr.next to prev.', practiceUrl: 'https://leetcode.com/problems/reverse-linked-list/' },
+      { id: 'd-7', title: 'Linked List Cycle', topic: 'Linked Lists', difficulty: 'Easy', completed: true, bookmarked: false, timeComplexity: 'O(n)', spaceComplexity: 'O(1)', hint: 'Floyd\'s fast and slow pointer cycle detection.', practiceUrl: 'https://leetcode.com/problems/linked-list-cycle/' },
+      // 4. Stack
+      { id: 'd-8', title: 'Valid Parentheses', topic: 'Stack', difficulty: 'Easy', completed: true, bookmarked: false, timeComplexity: 'O(n)', spaceComplexity: 'O(n)', hint: 'Push expected closing brackets onto stack.', practiceUrl: 'https://leetcode.com/problems/valid-parentheses/' },
+      { id: 'd-9', title: 'Daily Temperatures', topic: 'Stack', difficulty: 'Medium', completed: false, bookmarked: true, timeComplexity: 'O(n)', spaceComplexity: 'O(n)', hint: 'Monotonic decreasing stack of temperature indices.', practiceUrl: 'https://leetcode.com/problems/daily-temperatures/' },
+      // 5. Queue
+      { id: 'd-10', title: 'Implement Queue using Stacks', topic: 'Queue', difficulty: 'Easy', completed: true, bookmarked: false, timeComplexity: 'O(1) amortized', spaceComplexity: 'O(n)', hint: 'In-stack for push, out-stack for pop/peek.', practiceUrl: 'https://leetcode.com/problems/implement-queue-using-stacks/' },
+      // 6. Hash Map
+      { id: 'd-11', title: 'Valid Anagram', topic: 'Hash Map', difficulty: 'Easy', completed: true, bookmarked: false, timeComplexity: 'O(n)', spaceComplexity: 'O(1)', hint: 'Count char frequencies with array of size 26.', practiceUrl: 'https://leetcode.com/problems/valid-anagram/' },
+      { id: 'd-12', title: 'Group Anagrams', topic: 'Hash Map', difficulty: 'Medium', completed: false, bookmarked: true, timeComplexity: 'O(n * k log k)', spaceComplexity: 'O(n*k)', hint: 'Sort strings as hash map grouping keys.', practiceUrl: 'https://leetcode.com/problems/group-anagrams/' },
+      // 7. Trees
+      { id: 'd-13', title: 'Maximum Depth of Binary Tree', topic: 'Trees', difficulty: 'Easy', completed: true, bookmarked: false, timeComplexity: 'O(n)', spaceComplexity: 'O(h)', hint: 'Recursively 1 + max(depth(left), depth(right)).', practiceUrl: 'https://leetcode.com/problems/maximum-depth-of-binary-tree/' },
+      { id: 'd-14', title: 'Validate Binary Search Tree', topic: 'Trees', difficulty: 'Medium', completed: false, bookmarked: true, timeComplexity: 'O(n)', spaceComplexity: 'O(h)', hint: 'Verify node value falls strictly within (min, max).', practiceUrl: 'https://leetcode.com/problems/validate-binary-search-tree/' },
+      // 8. Graphs
+      { id: 'd-15', title: 'Number of Islands', topic: 'Graphs', difficulty: 'Medium', completed: false, bookmarked: true, timeComplexity: 'O(m*n)', spaceComplexity: 'O(m*n)', hint: 'BFS/DFS sink connected land on finding "1".', practiceUrl: 'https://leetcode.com/problems/number-of-islands/' },
+      { id: 'd-16', title: 'Course Schedule', topic: 'Graphs', difficulty: 'Medium', completed: false, bookmarked: false, timeComplexity: 'O(V+E)', spaceComplexity: 'O(V+E)', hint: 'Topological sort via Kahn\'s algorithm or DFS cycle check.', practiceUrl: 'https://leetcode.com/problems/course-schedule/' },
+      // 9. Sorting
+      { id: 'd-17', title: 'Sort Colors (Dutch National Flag)', topic: 'Sorting', difficulty: 'Medium', completed: false, bookmarked: false, timeComplexity: 'O(n)', spaceComplexity: 'O(1)', hint: 'Three pointers: low, mid, high swapping 0s and 2s.', practiceUrl: 'https://leetcode.com/problems/sort-colors/' },
+      { id: 'd-18', title: 'Merge Intervals', topic: 'Sorting', difficulty: 'Medium', completed: false, bookmarked: true, timeComplexity: 'O(n log n)', spaceComplexity: 'O(n)', hint: 'Sort by start time and merge overlaps.', practiceUrl: 'https://leetcode.com/problems/merge-intervals/' },
+      // 10. Searching
+      { id: 'd-19', title: 'Binary Search', topic: 'Searching', difficulty: 'Easy', completed: true, bookmarked: false, timeComplexity: 'O(log n)', spaceComplexity: 'O(1)', hint: 'mid = left + (right - left) / 2 to prevent overflow.', practiceUrl: 'https://leetcode.com/problems/binary-search/' },
+      { id: 'd-20', title: 'Search in Rotated Sorted Array', topic: 'Searching', difficulty: 'Medium', completed: false, bookmarked: true, timeComplexity: 'O(log n)', spaceComplexity: 'O(1)', hint: 'Check which half is sorted and branch search.', practiceUrl: 'https://leetcode.com/problems/search-in-rotated-sorted-array/' }
+    ];
+
+    const INITIAL_PROFILE = {
+      name: 'Siddhartha',
+      college: 'Jain Institute of Technology Davangere',
+      branch: 'Computer Science & Engineering',
+      yearOfStudy: '2nd Year (3rd Semester)',
+      targetRole: 'Software Development Engineer (SDE 1)',
+      bio: 'Computer Science student passionate about Data Structures, Algorithms, full-stack software development, and systems engineering. Preparing consistently for campus placements, technical assessments, and software engineering internships.',
+      githubUsername: 'siddharthadev',
+      linkedinUsername: 'siddhartha-engineer',
+      streakDays: 5,
+      skills: [
+        { name: 'C / C++', level: 'Advanced' },
+        { name: 'Data Structures & Algorithms', level: 'Intermediate' },
+        { name: 'JavaScript / TypeScript', level: 'Intermediate' },
+        { name: 'React', level: 'Intermediate' },
+        { name: 'Python', level: 'Intermediate' },
+        { name: 'SQL & PostgreSQL', level: 'Intermediate' },
+        { name: 'Git & GitHub', level: 'Advanced' },
+        { name: 'HTML & CSS', level: 'Advanced' },
+        { name: 'Tailwind CSS', level: 'Advanced' }
+      ]
+    };
+
+    function App() {
+      const [currentTab, setCurrentTab] = useState('home');
+      const [profile, setProfile] = useState(() => {
+        const saved = localStorage.getItem('cj_profile_v2');
+        return saved ? JSON.parse(saved) : INITIAL_PROFILE;
+      });
+      const [roadmap, setRoadmap] = useState(() => {
+        const saved = localStorage.getItem('cj_roadmap_v2');
+        return saved ? JSON.parse(saved) : INITIAL_ROADMAP;
+      });
+      const [tasks, setTasks] = useState(() => {
+        const saved = localStorage.getItem('cj_tasks_v2');
+        return saved ? JSON.parse(saved) : INITIAL_TASKS;
+      });
+      const [projects, setProjects] = useState(() => {
+        const saved = localStorage.getItem('cj_projects_v2');
+        return saved ? JSON.parse(saved) : INITIAL_PROJECTS;
+      });
+      const [dsa, setDsa] = useState(() => {
+        const saved = localStorage.getItem('cj_dsa_v2');
+        return saved ? JSON.parse(saved) : INITIAL_DSA_PROBLEMS;
+      });
+
+      const [selectedDsaTopic, setSelectedDsaTopic] = useState('All');
+      const [selectedDsaDifficulty, setSelectedDsaDifficulty] = useState('All');
+      const [editingProject, setEditingProject] = useState(null);
+      const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+      const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+      useEffect(() => {
+        localStorage.setItem('cj_profile_v2', JSON.stringify(profile));
+      }, [profile]);
+      useEffect(() => {
+        localStorage.setItem('cj_roadmap_v2', JSON.stringify(roadmap));
+      }, [roadmap]);
+      useEffect(() => {
+        localStorage.setItem('cj_tasks_v2', JSON.stringify(tasks));
+      }, [tasks]);
+      useEffect(() => {
+        localStorage.setItem('cj_projects_v2', JSON.stringify(projects));
+      }, [projects]);
+      useEffect(() => {
+        localStorage.setItem('cj_dsa_v2', JSON.stringify(dsa));
+      }, [dsa]);
+
+      // Metrics calculation
+      const completedSteps = roadmap.filter(s => s.status === 'completed').length;
+      const roadmapPercent = Math.round((completedSteps / roadmap.length) * 100);
+      const completedTasks = tasks.filter(t => t.completed).length;
+      const tasksPercent = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
+      const solvedDSA = dsa.filter(p => p.completed).length;
+      const completedProjects = projects.filter(p => p.status === 'Completed').length;
+
+      const dsaCategories = ['All', 'Arrays', 'Strings', 'Linked Lists', 'Stack', 'Queue', 'Hash Map', 'Trees', 'Graphs', 'Sorting', 'Searching'];
+
+      const navTabs = [
+        { id: 'home', label: 'Home', icon: '🏠' },
+        { id: 'roadmap', label: 'Roadmap', icon: '🗺️' },
+        { id: 'daily', label: 'Daily', icon: '✅' },
+        { id: 'projects', label: 'Projects', icon: '📁' },
+        { id: 'coding', label: 'Coding', icon: '💻' },
+        { id: 'career', label: 'Career', icon: '🎓' },
+        { id: 'profile', label: 'Profile', icon: '👤' }
+      ];
+
+      return (
+        <div className="min-h-screen flex flex-col bg-slate-50">
+          {/* Header */}
+          <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
+            <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+              <button 
+                onClick={() => setCurrentTab('home')}
+                className="flex items-center gap-2 group text-left focus:outline-none"
+              >
+                <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold shadow-xs">
+                  🚀
+                </div>
+                <span className="text-base sm:text-lg font-bold tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors">
+                  Career Journey
+                </span>
+              </button>
+
+              <nav className="hidden md:flex items-center gap-1">
+                {navTabs.map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setCurrentTab(tab.id)}
+                    className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 ${
+                      currentTab === tab.id ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    }`}
+                  >
+                    <span>{tab.icon}</span>
+                    <span>{tab.label}</span>
+                  </button>
+                ))}
+              </nav>
+
+              <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold">
+                  <span>🔥</span>
+                  <span>{profile.streakDays}d Streak</span>
+                </div>
+                <button
+                  onClick={() => setCurrentTab('profile')}
+                  className="w-8 h-8 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center hover:ring-2 hover:ring-indigo-500"
+                >
+                  {profile.name.charAt(0)}
+                </button>
+              </div>
+            </div>
+          </header>
+
+          {/* Main Content Area */}
+          <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-6 pb-24 md:pb-12 animate-fadeIn">
+            {/* 1. HOME */}
+            {currentTab === 'home' && (
+              <div className="space-y-6">
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 text-white p-6 sm:p-8 shadow-md">
+                  <div className="max-w-2xl">
+                    <span className="text-indigo-200 text-xs font-semibold uppercase tracking-wider block mb-2">
+                      Engineering Student Career Companion
+                    </span>
+                    <h1 className="text-2xl sm:text-4xl font-extrabold mb-3">
+                      Welcome back, {profile.name}! 👋
+                    </h1>
+                    <p className="text-indigo-100 text-sm sm:text-base leading-relaxed mb-6">
+                      Every line of code you write and every problem you solve brings you closer to your dream software developer offer at Jain Institute of Technology Davangere. Small, consistent steps build unstoppable momentum.
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                      <button
+                        onClick={() => { triggerCelebration(); setCurrentTab('roadmap'); }}
+                        className="px-5 py-3 rounded-xl bg-white text-indigo-900 font-bold text-sm shadow-md hover:bg-indigo-50 transition-all"
+                      >
+                        Start Your Career Journey 🚀
+                      </button>
+                      <button
+                        onClick={() => setCurrentTab('daily')}
+                        className="px-4 py-3 rounded-xl bg-indigo-700/60 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold border border-indigo-400/30"
+                      >
+                        Today's Tasks ({completedTasks}/{tasks.length})
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Motivational Quote */}
+                <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-slate-800 text-xs sm:text-sm flex items-center gap-3">
+                  <span className="text-xl">💡</span>
+                  <div>
+                    <span className="font-bold text-amber-900">Daily Engineering Wisdom: </span>
+                    <span>"You don't have to be great to start, but you have to start to be great. Master one concept at a time."</span>
+                  </div>
+                </div>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div onClick={() => setCurrentTab('roadmap')} className="p-4 rounded-xl bg-white border border-slate-200 cursor-pointer hover:border-indigo-300 transition-all">
+                    <div className="text-xs font-semibold text-slate-500 uppercase">Roadmap</div>
+                    <div className="text-2xl font-bold text-slate-900 mt-1">{roadmapPercent}%</div>
+                    <p className="text-[11px] text-slate-500">{completedSteps} of 12 steps</p>
+                  </div>
+                  <div onClick={() => setCurrentTab('daily')} className="p-4 rounded-xl bg-white border border-slate-200 cursor-pointer hover:border-emerald-300 transition-all">
+                    <div className="text-xs font-semibold text-slate-500 uppercase">Today's Tasks</div>
+                    <div className="text-2xl font-bold text-slate-900 mt-1">{completedTasks}/{tasks.length}</div>
+                    <p className="text-[11px] text-slate-500">{tasksPercent}% done</p>
+                  </div>
+                  <div onClick={() => setCurrentTab('coding')} className="p-4 rounded-xl bg-white border border-slate-200 cursor-pointer hover:border-blue-300 transition-all">
+                    <div className="text-xs font-semibold text-slate-500 uppercase">DSA Solved</div>
+                    <div className="text-2xl font-bold text-slate-900 mt-1">{solvedDSA}/{dsa.length}</div>
+                    <p className="text-[11px] text-slate-500">Practice questions</p>
+                  </div>
+                  <div onClick={() => setCurrentTab('projects')} className="p-4 rounded-xl bg-white border border-slate-200 cursor-pointer hover:border-purple-300 transition-all">
+                    <div className="text-xs font-semibold text-slate-500 uppercase">Projects</div>
+                    <div className="text-2xl font-bold text-slate-900 mt-1">{completedProjects}/{projects.length}</div>
+                    <p className="text-[11px] text-slate-500">Completed portfolio</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 2. ROADMAP */}
+            {currentTab === 'roadmap' && (
+              <div className="space-y-6">
+                <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200">
+                  <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">Software Developer Roadmap (12 Steps)</h1>
+                  <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                    Structured 12-milestone engineering curriculum from HTML & CSS to Placement & Interview Preparation.
+                  </p>
+                  <div className="mt-4 w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                    <div className="bg-indigo-600 h-2 transition-all duration-500" style={{ width: `${roadmapPercent}%` }}></div>
+                  </div>
+                  <div className="flex justify-between text-xs text-slate-500 mt-1.5 font-medium">
+                    <span>{completedSteps} of 12 steps completed</span>
+                    <span className="font-bold text-indigo-600">{roadmapPercent}%</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {roadmap.map(step => (
+                    <div key={step.id} className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <span className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${
+                            step.status === 'completed' ? 'bg-emerald-500 text-white' : step.status === 'in_progress' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'
+                          }`}>
+                            {step.status === 'completed' ? '✓' : step.id}
+                          </span>
+                          <div>
+                            <div className="text-[11px] text-slate-400 font-medium">Step {step.id} · {step.category} · {step.estimatedWeeks}</div>
+                            <h2 className="text-base font-bold text-slate-900">{step.title}</h2>
+                          </div>
+                        </div>
+
+                        <select
+                          value={step.status}
+                          onChange={(e) => {
+                            const newStatus = e.target.value;
+                            setRoadmap(prev => prev.map(s => {
+                              if (s.id !== step.id) return s;
+                              return {
+                                ...s,
+                                status: newStatus,
+                                subSkills: s.subSkills.map(sub => ({
+                                  ...sub,
+                                  completed: newStatus === 'completed' ? true : newStatus === 'not_started' ? false : sub.completed
+                                }))
+                              };
+                            }));
+                            if (newStatus === 'completed') triggerCelebration();
+                          }}
+                          className="text-xs font-semibold px-2.5 py-1 rounded-lg border border-slate-200 bg-white shrink-0"
+                        >
+                          <option value="not_started">⚪ Not Started</option>
+                          <option value="in_progress">🔵 In Progress</option>
+                          <option value="completed">🟢 Completed</option>
+                        </select>
+                      </div>
+
+                      <p className="text-xs text-slate-600">{step.description}</p>
+
+                      <div className="pt-2 border-t border-slate-100 space-y-1.5">
+                        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Competencies</span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                          {step.subSkills.map(sub => (
+                            <div
+                              key={sub.id}
+                              onClick={() => {
+                                setRoadmap(prev => prev.map(s => {
+                                  if (s.id !== step.id) return s;
+                                  const updatedSubs = s.subSkills.map(sb => sb.id === sub.id ? { ...sb, completed: !sb.completed } : sb);
+                                  const allDone = updatedSubs.every(sb => sb.completed);
+                                  const someDone = updatedSubs.some(sb => sb.completed);
+                                  const nextStatus = allDone ? 'completed' : someDone ? 'in_progress' : 'not_started';
+                                  if (allDone && s.status !== 'completed') triggerCelebration();
+                                  return { ...s, subSkills: updatedSubs, status: nextStatus };
+                                }));
+                              }}
+                              className={`flex items-center gap-2 p-2 rounded-lg border text-xs cursor-pointer transition-colors ${
+                                sub.completed ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-white text-slate-700 border-slate-200'
+                              }`}
+                            >
+                              <input type="checkbox" checked={sub.completed} readOnly className="rounded text-emerald-600" />
+                              <span className={sub.completed ? 'line-through text-slate-400' : ''}>{sub.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 3. DAILY LEARNING */}
+            {currentTab === 'daily' && (
+              <div className="space-y-6">
+                <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">Daily Learning Tracker</h1>
+                      <p className="text-xs sm:text-sm text-slate-600 mt-1">Set daily targets, check them off, and maintain your streak.</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-extrabold text-emerald-600">{tasksPercent}%</div>
+                      <span className="text-xs text-slate-500">{completedTasks} of {tasks.length} Completed</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5">
+                  {tasks.map(task => (
+                    <div
+                      key={task.id}
+                      className={`p-4 rounded-xl border flex items-center justify-between gap-3 ${
+                        task.completed ? 'bg-slate-50 text-slate-400 border-slate-200' : 'bg-white text-slate-800 border-slate-200 shadow-xs'
+                      }`}
+                    >
+                      <div
+                        onClick={() => {
+                          setTasks(prev => prev.map(t => t.id === task.id ? { ...t, completed: !t.completed } : t));
+                          if (!task.completed) triggerCelebration();
+                        }}
+                        className="flex items-center gap-3 cursor-pointer flex-1"
+                      >
+                        <input type="checkbox" checked={task.completed} readOnly className="w-4 h-4 text-emerald-600 rounded" />
+                        <div>
+                          <p className={`text-xs sm:text-sm font-semibold ${task.completed ? 'line-through text-slate-400' : 'text-slate-900'}`}>{task.title}</p>
+                          <span className="text-[11px] text-slate-400">{task.category} · {task.estimatedMinutes} min · {task.priority} priority</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setTasks(prev => prev.filter(t => t.id !== task.id))}
+                        className="text-slate-300 hover:text-rose-500 p-1 text-xs"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 4. PROJECTS */}
+            {currentTab === 'projects' && (
+              <div className="space-y-6">
+                <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">Projects Showcase & Planner</h1>
+                      <p className="text-xs sm:text-sm text-slate-600 mt-1">Project name, description, technologies, status, GitHub source, and live demo link.</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setEditingProject({
+                          id: 'proj-' + Date.now(),
+                          title: '',
+                          description: '',
+                          technologies: [],
+                          status: 'In Progress',
+                          githubUrl: '',
+                          liveUrl: ''
+                        });
+                        setIsProjectModalOpen(true);
+                      }}
+                      className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl self-start sm:self-auto"
+                    >
+                      + Add Project
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {projects.map(proj => (
+                    <div key={proj.id} className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Project Name</span>
+                            <h2 className="text-sm sm:text-base font-bold text-slate-900">{proj.title}</h2>
+                          </div>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded shrink-0 ${
+                            proj.status === 'Completed' ? 'bg-emerald-100 text-emerald-700' : proj.status === 'In Progress' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-700'
+                          }`}>
+                            {proj.status}
+                          </span>
+                        </div>
+                        <div className="mb-3">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Description</span>
+                          <p className="text-xs text-slate-600">{proj.description}</p>
+                        </div>
+                        <div className="mb-3">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Technologies</span>
+                          <div className="flex flex-wrap gap-1">
+                            {proj.technologies.map((t, idx) => (
+                              <span key={idx} className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium">{t}</span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 pt-3 border-t border-slate-100 text-xs">
+                        {proj.githubUrl && <a href={proj.githubUrl} target="_blank" className="font-semibold text-slate-700 hover:text-indigo-600">GitHub Code ↗</a>}
+                        {proj.liveUrl && <a href={proj.liveUrl} target="_blank" className="font-semibold text-indigo-600 hover:text-indigo-800">Live Demo ↗</a>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 5. CODING PRACTICE (DSA) */}
+            {currentTab === 'coding' && (
+              <div className="space-y-6">
+                <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200">
+                  <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">Data Structures & Algorithms</h1>
+                  <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                    Master essential problem patterns across Arrays, Strings, Linked Lists, Stack, Queue, Hash Map, Trees, Graphs, Sorting, and Searching.
+                  </p>
+                  
+                  {/* Category Filter Chips */}
+                  <div className="mt-4 flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                    {dsaCategories.map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedDsaTopic(cat)}
+                        className={`px-3 py-1.5 rounded-xl text-xs whitespace-nowrap transition-colors ${
+                          selectedDsaTopic === cat ? 'bg-slate-900 text-white font-bold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2.5">
+                  {dsa
+                    .filter(prob => selectedDsaTopic === 'All' || prob.topic === selectedDsaTopic)
+                    .map(prob => (
+                    <div key={prob.id} className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs space-y-2">
+                      <div className="flex items-start justify-between gap-3">
+                        <div
+                          onClick={() => {
+                            setDsa(prev => prev.map(p => p.id === prob.id ? { ...p, completed: !p.completed } : p));
+                            if (!prob.completed) triggerCelebration();
+                          }}
+                          className="flex items-center gap-3 cursor-pointer"
+                        >
+                          <input type="checkbox" checked={prob.completed} readOnly className="w-4 h-4 text-emerald-600 rounded" />
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h2 className={`text-xs sm:text-sm font-bold ${prob.completed ? 'line-through text-slate-400' : 'text-slate-900'}`}>{prob.title}</h2>
+                              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                                prob.difficulty === 'Easy' ? 'bg-emerald-100 text-emerald-700' : prob.difficulty === 'Medium' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'
+                              }`}>
+                                {prob.difficulty}
+                              </span>
+                            </div>
+                            <span className="text-[11px] text-slate-500">{prob.topic} · Time: {prob.timeComplexity} · Space: {prob.spaceComplexity}</span>
+                          </div>
+                        </div>
+
+                        <a href={prob.practiceUrl} target="_blank" className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 shrink-0">Solve ↗</a>
+                      </div>
+
+                      <div className="p-2.5 rounded-lg bg-slate-50 text-[11px] text-slate-600 border border-slate-100">
+                        <span className="font-bold text-slate-800">Intuition: </span>{prob.hint}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 6. CAREER & INTERVIEW */}
+            {currentTab === 'career' && (
+              <div className="space-y-6">
+                <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200">
+                  <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">Career & Placement Accelerator</h1>
+                  <p className="text-xs sm:text-sm text-slate-600 mt-1">ATS resume rules, cold outreach templates, and core technical interview questions.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-3">
+                    <h2 className="text-sm font-bold text-slate-900">ATS Resume Essentials for Students</h2>
+                    <ul className="text-xs text-slate-600 space-y-1.5 list-disc pl-4">
+                      <li>Single-column layout with clean margins and no multi-column tables.</li>
+                      <li>Use standard section headers: Education, Technical Skills, Featured Projects, Experience.</li>
+                      <li>Write bullets with Google XYZ formula: "Accomplished [X] as measured by [Y] by doing [Z]".</li>
+                      <li>Group technical skills into Languages, Frameworks, Developer Tools, and Core CS.</li>
+                    </ul>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-3">
+                    <h2 className="text-sm font-bold text-slate-900">Core CS Interview Topics</h2>
+                    <ul className="text-xs text-slate-600 space-y-1.5 list-disc pl-4">
+                      <li><strong className="text-slate-800">OOP:</strong> Encapsulation, Abstraction, Inheritance, Polymorphism.</li>
+                      <li><strong className="text-slate-800">DBMS:</strong> ACID properties, indexing, normalization (1NF to 3NF).</li>
+                      <li><strong className="text-slate-800">OS:</strong> Process vs Thread, Deadlock 4 conditions, Virtual memory.</li>
+                      <li><strong className="text-slate-800">CN:</strong> TCP 3-way handshake, DNS lookup, HTTP vs HTTPS.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 7. PROFILE */}
+            {currentTab === 'profile' && (
+              <div className="space-y-6">
+                <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 shadow-xs">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-16 h-16 rounded-2xl bg-slate-900 text-white font-extrabold text-2xl flex items-center justify-center">
+                      {profile.name.charAt(0)}
+                    </div>
+                    <div>
+                      <h1 className="text-xl font-bold text-slate-900">{profile.name}</h1>
+                      <p className="text-xs text-slate-600">{profile.branch} · {profile.yearOfStudy}</p>
+                      <p className="text-xs text-indigo-600 font-semibold">{profile.college}</p>
+                    </div>
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-slate-700 border-t border-slate-100 pt-3">{profile.bio}</p>
+
+                  <div className="mt-4 pt-3 border-t border-slate-100">
+                    <span className="text-xs font-bold text-slate-700 block mb-2">Technical Skills</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {profile.skills.map((s, idx) => (
+                        <span key={idx} className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-medium">
+                          {s.name} <span className="text-[10px] text-slate-400">({s.level})</span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </main>
+
+          {/* Mobile Bottom Navigation Bar */}
+          <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 md:hidden">
+            <div className="grid grid-cols-7 h-16 max-w-lg mx-auto">
+              {navTabs.map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setCurrentTab(tab.id)}
+                  className={`flex flex-col items-center justify-center py-1 transition-colors ${
+                    currentTab === tab.id ? 'text-indigo-600 font-bold' : 'text-slate-500'
+                  }`}
+                >
+                  <span className="text-lg">{tab.icon}</span>
+                  <span className="text-[10px] tracking-tight">{tab.label}</span>
+                </button>
+              ))}
+            </div>
+          </nav>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>

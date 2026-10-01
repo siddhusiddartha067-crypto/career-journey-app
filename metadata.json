@@ -1,0 +1,6 @@
+{
+  "name": "Career Journey",
+  "description": "A modern and simple career development companion for engineering students to master skills, practice coding, build projects, and become software developers.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
