@@ -81,3 +81,19 @@ career-journey-app/
 ## 🌐 Live Demo
 
 [🚀 Open Career Journey](https://career-journey-722612908959.asia-southeast1.run.app)
+## 📸 Screenshots
+
+### Home Dashboard
+![Career Journey Home](home.png)
+
+### Software Developer Roadmap
+![Career Journey Roadmap](roadmap.png)
+
+### DSA Practice
+![Career Journey DSA](dsa.png)
+
+### Projects
+![Career Journey Projects](projects.png)
+
+### Profile
+![Career Journey Profile](profile.png)
