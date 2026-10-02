@@ -78,3 +78,6 @@ career-journey-app/
 ├── metadata.json
 ├── bun.lock
 └── .gitignore
+## 🌐 Live Demo
+
+[🚀 Open Career Journey](https://career-journey-722612908959.asia-southeast1.run.app)
